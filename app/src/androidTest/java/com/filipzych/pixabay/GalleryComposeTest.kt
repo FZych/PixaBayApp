@@ -12,7 +12,7 @@ class GalleryComposeTest {
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
     @Test
-    fun shouldDisplayTyped() {
+    fun shouldDisplayFruitTextAtStart() {
         composeTestRule.onNodeWithText("fruit").assertExists()
     }
 }
