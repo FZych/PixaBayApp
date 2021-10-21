@@ -25,8 +25,8 @@ class GalleryViewModelTest : BaseViewModelTest() {
     }
 
     @Test
-    fun `should trigger fruit search on initialization`()  {
-        verify(searchUseCase).build(Params("fruit"))
+    fun `should trigger fruits search on initialization`()  {
+        verify(searchUseCase).build(Params("fruits"))
     }
 
     @Test

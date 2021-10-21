@@ -26,15 +26,15 @@ class GalleryComposeTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun should_display_fruit_text_at_start() {
-        composeTestRule.onNodeWithText("fruit").assertExists()
+    fun should_display_fruits_text_at_start() {
+        composeTestRule.onNodeWithText("fruits").assertExists()
     }
 
     @Before
     fun setUp() {
         val fragment = GalleryFragment()
         val useCase = mock<SearchUseCase> {
-            on { build(SearchUseCase.Params("fruit")) } doReturn flowOf(
+            on { build(SearchUseCase.Params("fruits")) } doReturn flowOf(
                 mockSearchResponseAndroidTest()
             )
         }

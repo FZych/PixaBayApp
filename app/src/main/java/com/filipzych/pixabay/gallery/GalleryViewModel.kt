@@ -20,7 +20,7 @@ class GalleryViewModel(private val searchUseCase: SearchUseCase) : ViewModel() {
 
 
     init {
-        fetchImages("fruit")
+        fetchImages("fruits")
     }
 
 
@@ -38,8 +38,8 @@ class GalleryViewModel(private val searchUseCase: SearchUseCase) : ViewModel() {
         showConfirmationDialog.postValue(true)
     }
 
-    fun navigateToDetails() {
-        showConfirmationDialog.postValue(true)
+    fun navigateToDetails(navigate : Boolean) {
+        navigateToDetails.postValue(navigate)
     }
 
 }

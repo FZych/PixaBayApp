@@ -54,7 +54,7 @@ class GalleryFragment : Fragment() {
             if (showDialog) {
                 ShowComposableDialog(onConfirmClick = {
                     viewModel.showConfirmationDialog.value = false
-                    viewModel.navigateToDetails()
+                    viewModel.navigateToDetails(true)
                 },
                     onDismissClick = { viewModel.showConfirmationDialog.value = false })
             }
@@ -66,6 +66,7 @@ class GalleryFragment : Fragment() {
         viewModel.navigateToDetails.observeAsState().value?.let {
             if (it) {
                 findNavController().navigate(R.id.nav_details)
+                viewModel.navigateToDetails(false)
             }
         }
     }
