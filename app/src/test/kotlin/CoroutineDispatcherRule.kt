@@ -15,12 +15,10 @@ class CoroutineDispatcherRule(private val dispatcher : TestCoroutineDispatcher) 
         return object : Statement() {
             override fun evaluate() {
                 Dispatchers.setMain(dispatcher)
-                base!!.evaluate()
+                base?.evaluate()
                 dispatcher.cleanupTestCoroutines()
                 Dispatchers.resetMain()
             }
-
         }
     }
-
 }
