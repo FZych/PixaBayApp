@@ -10,19 +10,24 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import coil.compose.rememberImagePainter
+import com.filipzych.pixabay.R
 import com.filipzych.pixabay.gallery.data.entities.Hit
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
+
+@ExperimentalMaterialApi
 @ExperimentalFoundationApi
 class GalleryFragment : Fragment() {
 
@@ -37,16 +42,63 @@ class GalleryFragment : Fragment() {
             setContent {
                 MaterialTheme {
                     GalleryLayout(viewModel = vm)
+                    ConfirmationDialog(viewModel = vm)
+                    DetailsNavigation(viewModel = vm)
                 }
             }
         }
     }
 
     @Composable
+    fun ConfirmationDialog(viewModel: GalleryViewModel) {
+        viewModel.showConfirmationDialog.observeAsState().value?.let { showDialog ->
+            if (showDialog) {
+                ShowComposableDialog(onConfirmClick = {
+                    viewModel.showConfirmationDialog.value = false
+                    viewModel.navigateToDetails(true)
+                },
+                    onDismissClick = { viewModel.showConfirmationDialog.value = false })
+            }
+        }
+    }
+
+    @Composable
+    fun DetailsNavigation(viewModel: GalleryViewModel) {
+        viewModel.navigateToDetails.observeAsState().value?.let {
+            if (it) {
+                findNavController().navigate(R.id.nav_details)
+                viewModel.navigateToDetails(false)
+            }
+        }
+    }
+
+    @Composable
+    fun ShowComposableDialog(onConfirmClick: () -> Unit, onDismissClick: () -> Unit) {
+        AlertDialog(
+            onDismissRequest = { onDismissClick.invoke() },
+            text = {
+                Text("Would You like to see more details about this image?")
+            },
+            confirmButton = {
+                Button(
+                    onClick = { onConfirmClick.invoke() }) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { onDismissClick.invoke() }) {
+                    Text("No")
+                }
+            }
+        )
+    }
+
+    @Composable
     fun GalleryLayout(viewModel: GalleryViewModel) {
         Column(
             modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp) ,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             content = {
                 SearchHandler(viewModel = viewModel)
                 GalleryHandler(viewModel = viewModel)
@@ -66,37 +118,63 @@ class GalleryFragment : Fragment() {
     @Composable
     fun GallerySearch(textValue: String, onTextChanged: (String) -> Unit) {
         Surface(elevation = 2.dp, color = MaterialTheme.colors.surface) {
-            TextField(value = textValue, onValueChange = onTextChanged, modifier = Modifier.fillMaxWidth())
+            TextField(
+                value = textValue,
+                onValueChange = onTextChanged,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 
     @Composable
     fun GalleryHandler(viewModel: GalleryViewModel) {
-        viewModel.images.observeAsState().value.let {
-            GalleryGrid(it ?: emptyList())
-        }
-    }
-
-    @Composable
-    fun GalleryGrid(galleryItems: List<Hit>) {
-        LazyVerticalGrid(
-            cells = GridCells.Adaptive(minSize = 128.dp)
-        ) {
-            items(galleryItems.size) { photo ->
-                PhotoItem(galleryItems[photo])
+        viewModel.images.observeAsState().value?.let {
+            GalleryGrid(it) { photo ->
+                viewModel.selectedPhoto(photo)
             }
         }
     }
 
     @Composable
-    fun PhotoItem(photo: Hit) {
+    fun GalleryGrid(galleryItems: List<Hit>, onClick: (Hit) -> Unit) {
+        LazyVerticalGrid(
+            modifier = Modifier.semantics { contentDescription = "grid" },
+            cells = GridCells.Fixed(3)
+        ) {
+            items(galleryItems.size) { photo ->
+                PhotoItem(galleryItems[photo], onClick)
+            }
+        }
+    }
+
+    @Composable
+    fun PhotoItem(photo: Hit, onClick: (Hit) -> Unit) {
+        Card(
+            elevation = 4.dp,
+            onClick = { onClick(photo) },
+            modifier = Modifier.padding(4.dp) then(Modifier.size(164.dp))
+        ) {
+            Column {
+                GalleryImage(photo)
+                Text(fontSize = 8.sp, text = "User: " + photo.user, maxLines = 1)
+                Text(fontSize = 8.sp, text = "Tags: " + photo.tags, maxLines = 2)
+            }
+        }
+
+    }
+
+    @Composable
+    fun GalleryImage(photo: Hit) {
         Image(
-            painter = rememberImagePainter(photo.previewURL),
-            contentDescription = null,
+            painter = rememberImagePainter(data = photo.previewURL, builder = {
+                placeholder(R.drawable.placeholder).build()
+            }),
+            contentDescription = "image tags ${photo.tags}",
             modifier = Modifier.size(128.dp),
             contentScale = ContentScale.FillBounds
         )
     }
+
 }
 
 

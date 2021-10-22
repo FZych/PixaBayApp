@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
+@OpenForTesting
 abstract class BaseUseCase<Input, Output> {
 
     protected abstract fun onBuild(params: Input): Flow<Output>
