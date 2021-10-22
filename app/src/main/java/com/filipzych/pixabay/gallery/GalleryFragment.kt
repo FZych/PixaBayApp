@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import coil.compose.rememberImagePainter
@@ -150,12 +151,13 @@ class GalleryFragment : Fragment() {
     fun PhotoItem(photo: Hit, onClick: (Hit) -> Unit) {
         Card(
             elevation = 4.dp,
-            onClick = { onClick(photo) }
+            onClick = { onClick(photo) },
+            modifier = Modifier.padding(4.dp) then(Modifier.size(164.dp))
         ) {
             Column {
                 GalleryImage(photo)
-                Text(text = "User: " + photo.user, maxLines = 1)
-                Text(text = "Tags: " + photo.tags, maxLines = 2)
+                Text(fontSize = 8.sp, text = "User: " + photo.user, maxLines = 1)
+                Text(fontSize = 8.sp, text = "Tags: " + photo.tags, maxLines = 2)
             }
         }
 
@@ -172,7 +174,6 @@ class GalleryFragment : Fragment() {
             contentScale = ContentScale.FillBounds
         )
     }
-
 
 }
 
